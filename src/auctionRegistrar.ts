@@ -5,7 +5,7 @@ import {
   Bytes,
   ByteArray,
   crypto,
-  EthereumValue
+  log
 } from '@graphprotocol/graph-ts'
 
 // Import event types from the registry contract ABI
@@ -17,20 +17,20 @@ import {
   HashRegistered,
   HashReleased,
   HashInvalidated
-} from './types/AuctionRegistrar/AuctionRegistrar'
+} from '../generated/AuctionRegistrar/AuctionRegistrar'
 
 import {
   OwnerChanged,
   DeedClosed
-} from './types/Deed/Deed'
+} from '../generated/Deed/Deed'
 
 // Import entity types generated from the GraphQL schema
-import { Account, AuctionedName, Deed } from './types/schema'
+import { Account, AuctionedName, Deed } from '../generated/schema'
 
 var rootNode:ByteArray = byteArrayFromHex("93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae")
 
 export function auctionStarted(event: AuctionStarted): void {
-  let name = new AuctionedName(event.params.hash.toHex())
+  let name = new AuctionedName(event.params.hash.toHexString())
 
   name.registrationDate = event.params.registrationDate
   name.bidCount = 0
@@ -43,8 +43,7 @@ export function bidRevealed(event: BidRevealed): void {
     // Actually a cancelled bid; hash is not the label hash
     return
   }
-
-  let name = AuctionedName.load(event.params.hash.toHex())
+  let name = AuctionedName.load(event.params.hash.toHexString())
   switch(event.params.status) {
     case 0: // Harmless invalid bid
     case 1: // Bid revealed late
@@ -53,11 +52,11 @@ export function bidRevealed(event: BidRevealed): void {
       name.bidCount += 1
       break;
     case 2: // New winning bid
-      let account = new Account(event.params.owner.toHex())
+      let account = new Account(event.params.owner.toHexString())
       account.save()
 
       let registrar = AuctionRegistrar.bind(event.address)
-      let deedAddress = registrar.call('entries', [EthereumValue.fromFixedBytes(event.params.hash)])[1].toAddress().toHex()
+      let deedAddress = registrar.entries(event.params.hash).value1.toHexString()
 
       if(name.deed != null) {
         let oldDeed = Deed.load(name.deed)
@@ -66,7 +65,7 @@ export function bidRevealed(event: BidRevealed): void {
 
       let deed = new Deed(deedAddress)
       deed.value = event.params.value
-      deed.owner = event.params.owner.toHex()
+      deed.owner = event.params.owner.toHexString()
       deed.save()
 
       name.deed = deed.id
@@ -81,9 +80,9 @@ export function bidRevealed(event: BidRevealed): void {
 }
 
 export function hashRegistered(event: HashRegistered): void {
-  let name = AuctionedName.load(event.params.hash.toHex())
+  let name = AuctionedName.load(event.params.hash.toHexString())
   name.registrationDate = event.params.registrationDate
-  name.domain = crypto.keccak256(concat(rootNode, event.params.hash)).toHex();
+  name.domain = crypto.keccak256(concat(rootNode, event.params.hash)).toHexString();
   name.state = "FINALIZED"
   name.save()
 
@@ -93,14 +92,14 @@ export function hashRegistered(event: HashRegistered): void {
 }
 
 export function hashReleased(event: HashReleased): void {
-  let name = new AuctionedName(event.params.hash.toHex())
+  let name = new AuctionedName(event.params.hash.toHexString())
   name.releaseDate = event.block.timestamp
   name.state = "RELEASED"
   name.save()
 }
 
 export function hashInvalidated(event: HashInvalidated): void {
-  let name = new AuctionedName(event.params.hash.toHex())
+  let name = new AuctionedName(event.params.hash.toHexString())
   name.state = "FORBIDDEN"
   name.save()
 }

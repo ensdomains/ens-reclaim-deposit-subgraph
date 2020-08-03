@@ -1,6 +1,56 @@
-type Gravatar @entity {
+type Domain @entity {
+  id: ID!               # The namehash of the name
+  name: String          # The human readable name, if known. Unknown portions replaced with hash in square brackets (eg, foo.[1234].eth)
+  labelName: String     # The human readable label name (imported from CSV), if known
+  labelhash: Bytes      # keccak256(labelName)
+  parent: Domain        # The namehash (id) of the parent name
+  owner: Account!
+  events: [DomainEvent!]! @derivedFrom(field: "domain")
+}
+
+interface DomainEvent {
   id: ID!
-  owner: Bytes!
-  displayName: String!
-  imageUrl: String!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+}
+
+type Account @entity {
+  id: ID!
+  domains: [Domain!]! @derivedFrom(field: "owner")
+  deeds: [Deed!]! @derivedFrom(field: "owner")
+  registrations: [Registration!] @derivedFrom(field: "registrant")
+}
+
+enum AuctionState {
+  AUCTION
+  FINALIZED
+  RELEASED
+  FORBIDDEN
+}
+
+type Deed @entity {
+  id: ID!
+  owner: Account!
+  value: BigInt!
+  name: AuctionedName @derivedFrom(field: "deed")
+}
+
+type AuctionedName @entity {
+  id: ID!
+  domain: Domain
+  registrationDate: BigInt!
+  releaseDate: BigInt
+  deed: Deed
+  secondBid: BigInt
+  bidCount: Int!
+  state: AuctionState!
+}
+
+type Registration @entity {
+  id: ID!
+  domain: Domain
+  registrationDate: BigInt!
+  expiryDate: BigInt!
+  registrant: Account!
 }

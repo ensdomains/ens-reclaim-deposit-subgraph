@@ -25,13 +25,32 @@ import {
 } from '../generated/Deed/Deed'
 
 // Import entity types generated from the GraphQL schema
-import { Account, AuctionedName, Deed } from '../generated/schema'
+import { Account, AuctionedName, Deed, StatsEntity } from '../generated/schema'
 
 var rootNode:ByteArray = byteArrayFromHex("93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae")
 
+function loadStats(): StatsEntity {
+  let stats = StatsEntity.load('')
+  if(!stats){
+    stats = new StatsEntity('')
+    stats.numOfDeeds = 0
+    stats.numAuctioned = 0
+    stats.numFinalised = 0
+    stats.numReleased = 0
+    stats.numTransferred = 0
+    stats.numClosed = 0
+    stats.numForbidden = 0
+    stats.accumValue = BigInt.fromI32(0)
+    stats.currentValue = BigInt.fromI32(0)
+  }
+  return stats as StatsEntity
+}
+
 export function auctionStarted(event: AuctionStarted): void {
   let name = new AuctionedName(event.params.hash.toHexString())
-
+  let stats = loadStats()
+  stats.numAuctioned = stats.numAuctioned + 1
+  stats.save()
   name.registrationDate = event.params.registrationDate
   name.bidCount = 0
   name.state = "AUCTION"
@@ -70,6 +89,12 @@ export function bidRevealed(event: BidRevealed): void {
 
       name.deed = deed.id
       name.bidCount += 1
+
+      let stats = loadStats()
+      stats.numOfDeeds = stats.numOfDeeds + 1
+      stats.accumValue = stats.accumValue.plus(event.params.value)
+      stats.currentValue = stats.currentValue.plus(event.params.value)
+      stats.save()
       break;
     case 3: // Runner up bid
       name.secondBid = event.params.value
@@ -89,6 +114,9 @@ export function hashRegistered(event: HashRegistered): void {
   let deed = Deed.load(name.deed)
   deed.value = event.params.value
   deed.save()
+  let stats = loadStats()
+  stats.numFinalised = stats.numFinalised + 1
+  stats.save()
 }
 
 export function hashReleased(event: HashReleased): void {
@@ -96,12 +124,18 @@ export function hashReleased(event: HashReleased): void {
   name.releaseDate = event.block.timestamp
   name.state = "RELEASED"
   name.save()
+  let stats = loadStats()
+  stats.numReleased = stats.numReleased + 1
+  stats.save()
 }
 
 export function hashInvalidated(event: HashInvalidated): void {
   let name = new AuctionedName(event.params.hash.toHexString())
   name.state = "FORBIDDEN"
   name.save()
+  let stats = loadStats()
+  stats.numForbidden = stats.numForbidden + 1
+  stats.save()
 }
 
 export function deedTransferred(event: OwnerChanged): void {
@@ -109,12 +143,20 @@ export function deedTransferred(event: OwnerChanged): void {
   if(deed != null) {
     deed.owner = event.params.newOwner.toHex()
     deed.save()
+    let stats = loadStats()
+    stats.numTransferred = stats.numTransferred + 1
+    stats.save()
   }
 }
 
 export function deedClosed(event: DeedClosed): void {
   let deed = Deed.load(event.address.toHex())
   if(deed != null) {
+    let stats = loadStats()
+    stats.numOfDeeds = stats.numOfDeeds - 1
+    stats.currentValue = stats.currentValue.minus(deed.value)
+    stats.save()
+
     deed.owner = null;
     deed.value = BigInt.fromI32(0);
     deed.save();

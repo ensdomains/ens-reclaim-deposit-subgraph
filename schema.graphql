@@ -54,3 +54,16 @@ type Registration @entity {
   expiryDate: BigInt!
   registrant: Account!
 }
+
+type StatsEntity @entity {
+  id: ID!
+  numOfDeeds: Int
+  numAuctioned: Int
+  numFinalised: Int
+  numReleased: Int
+  numTransferred: Int
+  numClosed: Int
+  numForbidden: Int
+  accumValue: BigInt
+  currentValue: BigInt
+}

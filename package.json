@@ -5,6 +5,7 @@
     "build-contract": "solc contracts/Gravity.sol --abi -o abis --overwrite && solc contracts/Gravity.sol --bin -o bin --overwrite",
     "create": "graph create makoto/ens-reclaim-deposit-subgraph --node https://api.thegraph.com/deploy/",
     "create-local": "graph create makoto/ens-reclaim-deposit-subgraph --node http://127.0.0.1:8020",
+    "remove-local": "graph remove makoto/ens-reclaim-deposit-subgraph --node http://127.0.0.1:8020",
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy makoto/ens-reclaim-deposit-subgraph --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",

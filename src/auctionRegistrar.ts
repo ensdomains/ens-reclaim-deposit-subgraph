@@ -110,12 +110,13 @@ export function hashRegistered(event: HashRegistered): void {
   name.domain = crypto.keccak256(concat(rootNode, event.params.hash)).toHexString();
   name.state = "FINALIZED"
   name.save()
-
   let deed = Deed.load(name.deed)
+  let diff = deed.value.minus(event.params.value)
   deed.value = event.params.value
   deed.save()
   let stats = loadStats()
   stats.numFinalised = stats.numFinalised + 1
+  stats.currentValue = stats.currentValue.minus(diff)
   stats.save()
 }
 

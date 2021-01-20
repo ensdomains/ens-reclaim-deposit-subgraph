@@ -140,7 +140,20 @@ export function hashInvalidated(event: HashInvalidated): void {
 }
 
 export function deedTransferred(event: OwnerChanged): void {
+  log.warning(
+    '*** deedTransferred 1 Block number: {}, block hash: {}, transaction hash: {}',
+    [
+      event.block.number.toString(),       // "47596000"
+      event.block.hash.toHexString(),      // "0x..."
+      event.transaction.hash.toHexString() // "0x..."
+    ]
+  );
   let deed = Deed.load(event.address.toHex())
+  log.warning('***deedTransferred 2 address {} owner {} newOwner {}', [
+    event.address.toHex(),
+    deed.owner.toHex(),
+    event.params.newOwner.toHex(),
+  ])
   if(deed != null) {
     deed.owner = event.params.newOwner.toHex()
     deed.save()

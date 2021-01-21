@@ -167,13 +167,17 @@ export function deedTransferred(event: OwnerChanged): void {
       event.transaction.hash.toHexString() // "0x..."
     ]
   );
-  let deed = Deed.load(event.address.toHex())
-  log.warning('***deedTransferred 2 address {} newOwner {}', [
-    event.address.toHex(),
+  log.warning('***deedTransferred 2 address {}', [
+    event.address.toHex()
+  ])
+  log.warning('***deedTransferred 3 newOwner {}', [
     event.params.newOwner.toHex(),
   ])
+
+  let deed = Deed.load(event.address.toHex())
+  log.warning('***deedTransferred 4', [])
   if(deed != null) {
-    log.warning('***deedTransferred 3 oldOwner {}', [
+    log.warning('***deedTransferred 5 oldOwner {}', [
       deed.owner
     ])
     deed.owner = event.params.newOwner.toHex()
@@ -182,7 +186,7 @@ export function deedTransferred(event: OwnerChanged): void {
     stats.numTransferred = stats.numTransferred + 1
     stats.save()
   }else{
-    log.warning('***deedTransferred 4', [])  
+    log.warning('***deedTransferred 6', [])  
   }
 }
 
@@ -197,7 +201,9 @@ export function deedClosed(event: DeedClosed): void {
     ]
   );
   let deed = Deed.load(event.address.toHex())
+  log.warning('***deedClosed 2 deed {}', [deed.id])
   if(deed != null) {
+    log.warning('***deedClosed 3', [])
     let stats = loadStats()
     stats.numOfDeeds = stats.numOfDeeds - 1
     stats.currentValue = stats.currentValue.minus(deed.value)
@@ -206,6 +212,8 @@ export function deedClosed(event: DeedClosed): void {
     deed.owner = null;
     deed.value = BigInt.fromI32(0);
     deed.save();
+  }else{
+    log.warning('***deedClosed 4', [])
   }
 }
 

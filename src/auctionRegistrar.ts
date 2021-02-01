@@ -191,8 +191,6 @@ export function deedClosed(event: DeedClosed): void {
     stats.numOfDeeds = stats.numOfDeeds - 1
     stats.currentValue = stats.currentValue.minus(deed.value)
     stats.save()
-
-    deed.owner = null;
     deed.value = BigInt.fromI32(0);
     deed.save();
   }else{

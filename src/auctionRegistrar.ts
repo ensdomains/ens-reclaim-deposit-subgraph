@@ -58,6 +58,16 @@ export function auctionStarted(event: AuctionStarted): void {
 }
 
 export function bidRevealed(event: BidRevealed): void {
+  log.warning(
+    '*** bidRevealed 1 Block number: {}, block hash: {}, transaction hash: {}, address: {}',
+    [
+      event.block.number.toString(),       // "47596000"
+      event.block.hash.toHexString(),      // "0x..."
+      event.transaction.hash.toHexString(), // "0x..."
+      event.address.toHex()
+    ]
+  );
+
   if(event.params.status == 5) {
     // Actually a cancelled bid; hash is not the label hash
     return
@@ -105,6 +115,15 @@ export function bidRevealed(event: BidRevealed): void {
 }
 
 export function hashRegistered(event: HashRegistered): void {
+  log.warning(
+    '*** hashRegistered 1 Block number: {}, block hash: {}, transaction hash: {}, address: {}',
+    [
+      event.block.number.toString(),       // "47596000"
+      event.block.hash.toHexString(),      // "0x..."
+      event.transaction.hash.toHexString(), // "0x...",
+      event.address.toHex()
+    ]
+  );
   let name = AuctionedName.load(event.params.hash.toHexString())
   name.registrationDate = event.params.registrationDate
   name.domain = crypto.keccak256(concat(rootNode, event.params.hash)).toHexString();
@@ -149,42 +168,38 @@ export function deedTransferred(event: OwnerChanged): void {
     ]
   );
   log.warning('***deedTransferred 2 address {}', [
-    event.address.toHex()
+    event.address.toHexString()
   ])
   log.warning('***deedTransferred 3 newOwner {}', [
     event.params.newOwner.toHex(),
   ])
 
   let deed = Deed.load(event.address.toHex())
-  log.warning('***deedTransferred 4 address {} owner {} newOwner {}', [
-    event.address.toHex(),
-    deed.owner,
-    event.params.newOwner.toHex(),
-  ])
   if(deed != null) {
-    log.warning('***deedTransferred 5', [])
+    log.warning('***deedTransferred 5 oldOwner {}', [
+      deed.owner
+    ])
     deed.owner = event.params.newOwner.toHex()
     deed.save()
     let stats = loadStats()
     stats.numTransferred = stats.numTransferred + 1
     stats.save()
   }else{
-    log.warning('***deedTransferred 6', [])
+    log.warning('***deedTransferred 6', [])  
   }
 }
 
 export function deedClosed(event: DeedClosed): void {
   log.warning(
-    '*** deedClosed 1 Block number: {}, block hash: {}, transaction hash: {}',
+    '*** deedClosed 1 Block number: {}, block hash: {}, transaction hash: {}, address: {}',
     [
       event.block.number.toString(),       // "47596000"
       event.block.hash.toHexString(),      // "0x..."
-      event.transaction.hash.toHexString() // "0x..."
+      event.transaction.hash.toHexString(), // "0x...",
+      event.address.toHex()
     ]
   );
-
   let deed = Deed.load(event.address.toHex())
-  log.warning('***deedClosed 2 deed {}', [deed.id])
   if(deed != null) {
     log.warning('***deedClosed 3', [])
     let stats = loadStats()

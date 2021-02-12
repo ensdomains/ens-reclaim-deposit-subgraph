@@ -96,7 +96,28 @@ export function bidRevealed(event: BidRevealed): void {
       deed.value = event.params.value
       deed.owner = event.params.owner.toHexString()
       deed.save()
-
+      if(deed.owner != null){
+        log.warning(
+          '*** deed.save at bidRevealed() block {} transaction {} eventAddress {} eventAddress {} deedOwner {}',
+          [
+            event.block.number.toString(),       // "47596000"
+            event.transaction.hash.toHexString(), // "0x..."
+            event.address.toHex(),
+            deed.id.toHex(),
+            deed.owner.toHex()
+          ]
+        );  
+      }else{
+        log.warning(
+          '*** deed.save at bidRevealed() block {} transaction {} eventAddress {} eventAddress {} deedOwner: DOES_NOT_EXIST',
+          [
+            event.block.number.toString(),       // "47596000"
+            event.transaction.hash.toHexString(), // "0x..."
+            event.address.toHex(),
+            deed.id.toHex()
+          ]
+        );
+      }
       name.deed = deed.id
       name.bidCount += 1
 
@@ -133,6 +154,32 @@ export function hashRegistered(event: HashRegistered): void {
   let diff = deed.value.minus(event.params.value)
   deed.value = event.params.value
   deed.save()
+  if(deed.owner != null){
+    log.warning(
+      '*** deed.save at hashRegistered() block {} transaction {} eventAddress {} eventAddress {} deedOwner {}',
+      [
+        event.block.number.toString(),       // "47596000"
+        event.transaction.hash.toHexString(), // "0x..."
+        event.address.toHex(),
+        deed.id.toHex(),
+        deed.owner.toHex()
+      ]
+    );  
+  }else{
+    log.warning(
+      '*** deed.save at hashRegistered() block {} transaction {} eventAddress {} eventAddress {} deedOwner: DOES_NOT_EXIST',
+      [
+        event.block.number.toString(),       // "47596000"
+        event.transaction.hash.toHexString(), // "0x..."
+        event.address.toHex(),
+        deed.id.toHex()
+      ]
+    );
+  }
+
+
+
+
   let stats = loadStats()
   stats.numFinalised = stats.numFinalised + 1
   stats.currentValue = stats.currentValue.minus(diff)
@@ -181,6 +228,28 @@ export function deedTransferred(event: OwnerChanged): void {
     ])
     deed.owner = event.params.newOwner.toHex()
     deed.save()
+    if(deed.owner != null){
+      log.warning(
+        '*** deed.save at deedTransferred() block {} transaction {} eventAddress {} eventAddress {} deedOwner {}',
+        [
+          event.block.number.toString(),       // "47596000"
+          event.transaction.hash.toHexString(), // "0x..."
+          event.address.toHex(),
+          deed.id.toHex(),
+          deed.owner.toHex()
+        ]
+      );  
+    }else{
+      log.warning(
+        '*** deed.save at deedTransferred() block {} transaction {} eventAddress {} eventAddress {} deedOwner: DOES_NOT_EXIST',
+        [
+          event.block.number.toString(),       // "47596000"
+          event.transaction.hash.toHexString(), // "0x..."
+          event.address.toHex(),
+          deed.id.toHex()
+        ]
+      );
+    }
     let stats = loadStats()
     stats.numTransferred = stats.numTransferred + 1
     stats.save()
@@ -211,6 +280,28 @@ export function deedClosed(event: DeedClosed): void {
     log.warning('***deedClosed 3.2 value {}', [deed.value.toHexString()])
     log.warning('***deedClosed 3.3 owner {}', [deed.owner])
     deed.save();
+    if(deed.owner != null){
+      log.warning(
+        '*** deed.save at deedClosed() block {} transaction {} eventAddress {} eventAddress {} deedOwner {}',
+        [
+          event.block.number.toString(),       // "47596000"
+          event.transaction.hash.toHexString(), // "0x..."
+          event.address.toHex(),
+          deed.id.toHex(),
+          deed.owner.toHex()
+        ]
+      );  
+    }else{
+      log.warning(
+        '*** deed.save at deedClosed() block {} transaction {} eventAddress {} eventAddress {} deedOwner: DOES_NOT_EXIST',
+        [
+          event.block.number.toString(),       // "47596000"
+          event.transaction.hash.toHexString(), // "0x..."
+          event.address.toHex(),
+          deed.id.toHex()
+        ]
+      );
+    }
   }else{
     log.warning('***deedClosed 4', [])
   }

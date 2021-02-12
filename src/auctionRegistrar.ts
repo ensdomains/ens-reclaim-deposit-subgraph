@@ -207,6 +207,9 @@ export function deedClosed(event: DeedClosed): void {
     stats.currentValue = stats.currentValue.minus(deed.value)
     stats.save()
     deed.value = BigInt.fromI32(0);
+    log.warning('***deedClosed 3.1 id {}', [deed.id])
+    log.warning('***deedClosed 3.2 value {}', [deed.value.toHexString()])
+    log.warning('***deedClosed 3.3 owner {}', [deed.owner])
     deed.save();
   }else{
     log.warning('***deedClosed 4', [])

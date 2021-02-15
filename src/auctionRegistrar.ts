@@ -103,8 +103,8 @@ export function bidRevealed(event: BidRevealed): void {
             event.block.number.toString(),       // "47596000"
             event.transaction.hash.toHexString(), // "0x..."
             event.address.toHex(),
-            deed.id.toHex(),
-            deed.owner.toHex()
+            deed.id,
+            deed.owner
           ]
         );  
       }else{
@@ -114,7 +114,7 @@ export function bidRevealed(event: BidRevealed): void {
             event.block.number.toString(),       // "47596000"
             event.transaction.hash.toHexString(), // "0x..."
             event.address.toHex(),
-            deed.id.toHex()
+            deed.id
           ]
         );
       }
@@ -161,8 +161,8 @@ export function hashRegistered(event: HashRegistered): void {
         event.block.number.toString(),       // "47596000"
         event.transaction.hash.toHexString(), // "0x..."
         event.address.toHex(),
-        deed.id.toHex(),
-        deed.owner.toHex()
+        deed.id,
+        deed.owner
       ]
     );  
   }else{
@@ -172,7 +172,7 @@ export function hashRegistered(event: HashRegistered): void {
         event.block.number.toString(),       // "47596000"
         event.transaction.hash.toHexString(), // "0x..."
         event.address.toHex(),
-        deed.id.toHex()
+        deed.id
       ]
     );
   }
@@ -235,8 +235,8 @@ export function deedTransferred(event: OwnerChanged): void {
           event.block.number.toString(),       // "47596000"
           event.transaction.hash.toHexString(), // "0x..."
           event.address.toHex(),
-          deed.id.toHex(),
-          deed.owner.toHex()
+          deed.id,
+          deed.owner
         ]
       );  
     }else{
@@ -246,7 +246,7 @@ export function deedTransferred(event: OwnerChanged): void {
           event.block.number.toString(),       // "47596000"
           event.transaction.hash.toHexString(), // "0x..."
           event.address.toHex(),
-          deed.id.toHex()
+          deed.id
         ]
       );
     }
@@ -287,8 +287,8 @@ export function deedClosed(event: DeedClosed): void {
           event.block.number.toString(),       // "47596000"
           event.transaction.hash.toHexString(), // "0x..."
           event.address.toHex(),
-          deed.id.toHex(),
-          deed.owner.toHex()
+          deed.id,
+          deed.owner
         ]
       );  
     }else{
@@ -298,7 +298,7 @@ export function deedClosed(event: DeedClosed): void {
           event.block.number.toString(),       // "47596000"
           event.transaction.hash.toHexString(), // "0x..."
           event.address.toHex(),
-          deed.id.toHex()
+          deed.id
         ]
       );
     }

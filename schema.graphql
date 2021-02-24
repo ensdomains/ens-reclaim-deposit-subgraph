@@ -31,7 +31,7 @@ enum AuctionState {
 
 type Deed @entity {
   id: ID!
-  owner: Account!
+  owner: Account
   value: BigInt!
   name: AuctionedName @derivedFrom(field: "deed")
 }

@@ -4,7 +4,7 @@ type Domain @entity {
   labelName: String     # The human readable label name (imported from CSV), if known
   labelhash: Bytes      # keccak256(labelName)
   parent: Domain        # The namehash (id) of the parent name
-  owner: Account
+  owner: Account!
   events: [DomainEvent!]! @derivedFrom(field: "domain")
 }
 

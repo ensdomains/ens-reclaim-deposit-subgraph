@@ -41,7 +41,7 @@ type AuctionedName @entity {
   domain: Domain
   registrationDate: BigInt!
   releaseDate: BigInt
-  deed: Deed
+  deed: Deed!
   secondBid: BigInt
   bidCount: Int!
   state: AuctionState!
@@ -57,13 +57,13 @@ type Registration @entity {
 
 type StatsEntity @entity {
   id: ID!
-  numOfDeeds: Int
-  numAuctioned: Int
-  numFinalised: Int
-  numReleased: Int
-  numTransferred: Int
-  numClosed: Int
-  numForbidden: Int
-  accumValue: BigInt
-  currentValue: BigInt
+  numOfDeeds: Int!
+  numAuctioned: Int!
+  numFinalised: Int!
+  numReleased: Int!
+  numTransferred: Int!
+  numClosed: Int!
+  numForbidden: Int!
+  accumValue: BigInt!
+  currentValue: BigInt!
 }

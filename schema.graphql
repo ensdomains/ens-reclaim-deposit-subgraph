@@ -1,9 +1,9 @@
 type Domain @entity {
-  id: ID!               # The namehash of the name
-  name: String          # The human readable name, if known. Unknown portions replaced with hash in square brackets (eg, foo.[1234].eth)
-  labelName: String     # The human readable label name (imported from CSV), if known
-  labelhash: Bytes      # keccak256(labelName)
-  parent: Domain        # The namehash (id) of the parent name
+  id: ID! # The namehash of the name
+  name: String # The human readable name, if known. Unknown portions replaced with hash in square brackets (eg, foo.[1234].eth)
+  labelName: String # The human readable label name (imported from CSV), if known
+  labelhash: Bytes # keccak256(labelName)
+  parent: Domain # The namehash (id) of the parent name
   owner: Account!
   events: [DomainEvent!]! @derivedFrom(field: "domain")
 }
@@ -31,7 +31,7 @@ enum AuctionState {
 
 type Deed @entity {
   id: ID!
-  owner: Account!
+  owner: Account
   value: BigInt!
   name: AuctionedName @derivedFrom(field: "deed")
 }

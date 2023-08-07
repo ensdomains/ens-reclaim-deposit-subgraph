@@ -63,61 +63,71 @@ export function bidRevealed(event: BidRevealed): void {
     return
   }
   let name = AuctionedName.load(event.params.hash.toHexString())
-  switch(event.params.status) {
-    case 0: // Harmless invalid bid
-    case 1: // Bid revealed late
-      break;
-    case 4: // Bid lower than second bid
-      name.bidCount += 1
-      break;
-    case 2: // New winning bid
-      let account = new Account(event.params.owner.toHexString())
-      account.save()
-
-      let registrar = AuctionRegistrar.bind(event.address)
-      let deedAddress = registrar.entries(event.params.hash).value1.toHexString()
-
-      if(name.deed != null) {
-        let oldDeed = Deed.load(name.deed)
-        name.secondBid = oldDeed.value
-      }
-
-      let deed = new Deed(deedAddress)
-      deed.value = event.params.value
-      deed.owner = event.params.owner.toHexString()
-      deed.save()
-
-      name.deed = deed.id
-      name.bidCount += 1
-
-      let stats = loadStats()
-      stats.numOfDeeds = stats.numOfDeeds + 1
-      stats.accumValue = stats.accumValue.plus(event.params.value)
-      stats.currentValue = stats.currentValue.plus(event.params.value)
-      stats.save()
-      break;
-    case 3: // Runner up bid
-      name.secondBid = event.params.value
-      name.bidCount += 1
-      break;
+  if(name !== null){
+    switch(event.params.status) {
+      case 0: // Harmless invalid bid
+      case 1: // Bid revealed late
+        break;
+      case 4: // Bid lower than second bid
+        name.bidCount += 1
+        break;
+      case 2: // New winning bid
+        let account = new Account(event.params.owner.toHexString())
+        account.save()
+  
+        let registrar = AuctionRegistrar.bind(event.address)
+        let deedAddress = registrar.entries(event.params.hash).value1.toHexString()
+  
+        if(name.deed != null) {
+          let oldDeed = Deed.load(name.deed)
+          if(oldDeed !== null){
+            name.secondBid = oldDeed.value
+          }
+        }
+  
+        let deed = new Deed(deedAddress)
+        deed.value = event.params.value
+        deed.owner = event.params.owner.toHexString()
+        deed.save()
+  
+        name.deed = deed.id
+        name.bidCount += 1
+  
+        let stats = loadStats()
+        stats.numOfDeeds = stats.numOfDeeds + 1
+        stats.accumValue = stats.accumValue.plus(event.params.value)
+        stats.currentValue = stats.currentValue.plus(event.params.value)
+        stats.save()
+        break;
+      case 3: // Runner up bid
+        name.secondBid = event.params.value
+        name.bidCount += 1
+        break;
+    }
+    name.save()  
   }
-  name.save()
 }
 
 export function hashRegistered(event: HashRegistered): void {
   let name = AuctionedName.load(event.params.hash.toHexString())
-  name.registrationDate = event.params.registrationDate
-  name.domain = crypto.keccak256(concat(rootNode, event.params.hash)).toHexString();
-  name.state = "FINALIZED"
-  name.save()
-  let deed = Deed.load(name.deed)
-  let diff = deed.value.minus(event.params.value)
-  deed.value = event.params.value
-  deed.save()
-  let stats = loadStats()
-  stats.numFinalised = stats.numFinalised + 1
-  stats.currentValue = stats.currentValue.minus(diff)
-  stats.save()
+  if(name !== null){
+    name.registrationDate = event.params.registrationDate
+    name.domain = crypto.keccak256(concat(rootNode, event.params.hash)).toHexString();
+    name.state = "FINALIZED"
+    name.save()
+    if(name.deed !== null){
+      let deed = Deed.load(name.deed)
+      if(deed != null){
+        let diff = deed.value.minus(event.params.value)
+        deed.value = event.params.value
+        deed.save()  
+        let stats = loadStats()
+        stats.numFinalised = stats.numFinalised + 1
+        stats.currentValue = stats.currentValue.minus(diff)
+        stats.save()      
+      }
+    }
+  }
 }
 
 export function hashReleased(event: HashReleased): void {
